@@ -40,7 +40,7 @@ namespace Automatic9045.AtsEx.VehicleStructure
         public void DrawTrains(double vehicleLocation, Matrix vehicleToBlock, Matrix blockToCamera)
         {
             int vehicleBlockLocation = (int)vehicleLocation / 25 * 25;
-            Matrix vibration = default;
+            Matrix vehicleFrontToFirstCarFront = default;
 
             for (int i = 0; i < Structures.Count; i++)
             {
@@ -53,14 +53,13 @@ namespace Automatic9045.AtsEx.VehicleStructure
                     Matrix firstCarOriginToBlock = carToBlock;
                     Matrix blockToFirstCarOrigin = Matrix.Invert(firstCarOriginToBlock);
                     Matrix blockToFirstCarFront = blockToFirstCarOrigin * FirstCarOriginToFront;
-                    Matrix vehicleFrontToFirstCarFront = vehicleToBlock * blockToFirstCarFront;
-
-                    vibration = vehicleFrontToFirstCarFront;
-                    vibration.M41 *= VibrationCoefficients[i];
-                    vibration.M42 *= VibrationCoefficients[i];
-                    vibration.M43 *= VibrationCoefficients[i];
+                    vehicleFrontToFirstCarFront = vehicleToBlock * blockToFirstCarFront;
                 }
 
+                Matrix vibration = vehicleFrontToFirstCarFront;
+                vibration.M41 *= VibrationCoefficients[i];
+                vibration.M42 *= VibrationCoefficients[i];
+                vibration.M43 *= VibrationCoefficients[i];
                 Matrix transform = (Vibrate ? vibration : Matrix.Identity) * carToBlock * blockToCamera;
                 Direct3DProvider.Device.SetTransform(TransformState.World, transform);
 
