@@ -14,23 +14,23 @@ namespace Automatic9045.AtsEx.VehicleStructure
     internal class VehicleStructure
     {
         private readonly Direct3DProvider Direct3DProvider;
-        private readonly Train Train;
+        private readonly IReadOnlyList<Structure> Structures;
         private readonly IMatrixCalculator MatrixCalculator;
         private readonly bool Vibrate;
         private readonly Matrix FirstCarOriginToFront;
 
         private readonly List<float> VibrationCoefficients = new List<float>();
 
-        public VehicleStructure(Direct3DProvider direct3DProvider, Train train, IMatrixCalculator matrixCalculator, bool vibrate, Matrix firstCarOriginToFront)
+        public VehicleStructure(Direct3DProvider direct3DProvider, IReadOnlyList<Structure> structures, IMatrixCalculator matrixCalculator, bool vibrate, Matrix firstCarOriginToFront)
         {
             Direct3DProvider = direct3DProvider;
-            Train = train;
+            Structures = structures;
             MatrixCalculator = matrixCalculator;
             Vibrate = vibrate;
             FirstCarOriginToFront = firstCarOriginToFront;
 
             Random Random = new Random();
-            for (int i = 0; i < Train.TrainInfo.Structures.Count; i++)
+            for (int i = 0; i < Structures.Count; i++)
             {
                 float coefficient = i == 0 ? 1 : 0.2f + (float)Random.NextDouble();
                 VibrationCoefficients.Add(coefficient);
@@ -39,14 +39,12 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
         public void DrawTrains(double vehicleLocation, Matrix vehicleToBlock, Matrix blockToCamera)
         {
-            Train.Location = vehicleLocation;
-
             int vehicleBlockLocation = (int)vehicleLocation / 25 * 25;
             Matrix vibration = default;
 
-            for (int i = 0; i < Train.TrainInfo.Structures.Count; i++)
+            for (int i = 0; i < Structures.Count; i++)
             {
-                Structure car = Train.TrainInfo.Structures[i];
+                Structure car = Structures[i];
 
                 double location = vehicleLocation + car.Location;
                 Matrix carToBlock = MatrixCalculator.GetTrackMatrix(car, location, vehicleBlockLocation);

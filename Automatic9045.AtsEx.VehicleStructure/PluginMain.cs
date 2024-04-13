@@ -67,16 +67,15 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
         private void OnScenarioCreated(ScenarioCreatedEventArgs e)
         {
-            TrainFactory trainFactory = new TrainFactory(e.Scenario.TimeManager, e.Scenario.LocationManager, e.Scenario.Route, e.Scenario.ObjectDrawer.DrawDistanceManager);
             MatrixCalculator matrixCalculator = new MatrixCalculator(e.Scenario.Route);
 
             VehicleStructures = Config.VehicleTrain.StructureGroups
                 .Select(group =>
                 {
-                    Train train = trainFactory.Create(group.Structures, BaseDirectory);
+                    List<Structure> structures = StructureFactory.Create(group.Structures, BaseDirectory);
                     Matrix firstCarOriginToFront = Matrix.Translation(0, 0, (float)group.FirstStructureFront);
 
-                    VehicleStructure result = new VehicleStructure(Direct3DProvider.Instance, train, matrixCalculator, group.Vibrate, firstCarOriginToFront);
+                    VehicleStructure result = new VehicleStructure(Direct3DProvider.Instance, structures, matrixCalculator, group.Vibrate, firstCarOriginToFront);
                     return result;
                 })
                 .ToList();
