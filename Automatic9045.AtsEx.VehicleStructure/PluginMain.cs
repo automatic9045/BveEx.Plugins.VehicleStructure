@@ -72,10 +72,10 @@ namespace Automatic9045.AtsEx.VehicleStructure
             VehicleStructures = Config.VehicleTrain.StructureGroups
                 .Select(group =>
                 {
-                    List<Structure> structures = StructureFactory.Create(group.Structures, BaseDirectory);
+                    List<Car> cars = CarFactory.Create(Direct3DProvider.Instance, group.Structures, BaseDirectory, matrixCalculator);
                     Matrix firstCarOriginToFront = Matrix.Translation(0, 0, (float)group.FirstStructureFront);
 
-                    VehicleStructure result = new VehicleStructure(Direct3DProvider.Instance, structures, matrixCalculator, group.Vibrate, firstCarOriginToFront);
+                    VehicleStructure result = new VehicleStructure(Direct3DProvider.Instance, cars, group.Vibrate, firstCarOriginToFront);
                     return result;
                 })
                 .ToList();

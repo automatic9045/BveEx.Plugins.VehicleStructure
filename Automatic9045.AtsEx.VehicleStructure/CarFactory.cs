@@ -9,24 +9,26 @@ using BveTypes.ClassWrappers;
 
 namespace Automatic9045.AtsEx.VehicleStructure
 {
-    internal static class StructureFactory
+    internal static class CarFactory
     {
-        public static List<Structure> Create(Data.Structure[] data, string baseDirectory)
+        public static List<Car> Create(Direct3DProvider direct3DProvider, Data.Structure[] data, string baseDirectory, IMatrixCalculator matrixCalculator)
         {
-            List<Structure> structures = data
+            List<Car> cars = data
                 .Select(x =>
                 {
                     string modelPath = Path.Combine(baseDirectory, x.Model);
                     Model model = Model.FromXFile(modelPath);
-                    Structure result = new Structure(
+                    Structure structure = new Structure(
                         x.Distance, string.Empty,
                         0, 0, x.Z, 0, 0, 0,
                         TiltOptions.TiltsAlongGradient | TiltOptions.TiltsAlongCant, x.Span, model);
-                    return result;
+
+                    Car car = new Car(direct3DProvider, structure, Enumerable.Empty<Door>(), matrixCalculator);
+                    return car;
                 })
                 .ToList();
 
-            return structures;
+            return cars;
         }
     }
 }

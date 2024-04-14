@@ -14,23 +14,21 @@ namespace Automatic9045.AtsEx.VehicleStructure
     internal class VehicleStructure
     {
         private readonly Direct3DProvider Direct3DProvider;
-        private readonly IReadOnlyList<Structure> Structures;
-        private readonly IMatrixCalculator MatrixCalculator;
+        private readonly IReadOnlyList<Car> Cars;
         private readonly bool Vibrate;
         private readonly Matrix FirstCarOriginToFront;
 
         private readonly List<float> VibrationCoefficients = new List<float>();
 
-        public VehicleStructure(Direct3DProvider direct3DProvider, IReadOnlyList<Structure> structures, IMatrixCalculator matrixCalculator, bool vibrate, Matrix firstCarOriginToFront)
+        public VehicleStructure(Direct3DProvider direct3DProvider, IReadOnlyList<Car> cars, bool vibrate, Matrix firstCarOriginToFront)
         {
             Direct3DProvider = direct3DProvider;
-            Structures = structures;
-            MatrixCalculator = matrixCalculator;
+            Cars = cars;
             Vibrate = vibrate;
             FirstCarOriginToFront = firstCarOriginToFront;
 
             Random Random = new Random();
-            for (int i = 0; i < Structures.Count; i++)
+            for (int i = 0; i < Cars.Count; i++)
             {
                 float coefficient = i == 0 ? 1 : 0.2f + (float)Random.NextDouble();
                 VibrationCoefficients.Add(coefficient);
@@ -40,31 +38,32 @@ namespace Automatic9045.AtsEx.VehicleStructure
         public void DrawTrains(double vehicleLocation, Matrix vehicleToBlock, Matrix blockToCamera)
         {
             int vehicleBlockLocation = (int)vehicleLocation / 25 * 25;
-            Matrix vehicleFrontToFirstCarFront = default;
+            Car.ILocator firstCarLocator = null;
 
-            for (int i = 0; i < Structures.Count; i++)
+            for (int i = 0; i < Cars.Count; i++)
             {
-                Structure car = Structures[i];
+                Car car = Cars[i];
 
-                double location = vehicleLocation + car.Location;
-                Matrix carToBlock = MatrixCalculator.GetTrackMatrix(car, location, vehicleBlockLocation);
-                if (i == 0)
+                Car.ILocator carLocator;
+                if (Vibrate)
                 {
-                    Matrix firstCarOriginToBlock = carToBlock;
-                    Matrix blockToFirstCarOrigin = Matrix.Invert(firstCarOriginToBlock);
-                    Matrix blockToFirstCarFront = blockToFirstCarOrigin * FirstCarOriginToFront;
-                    vehicleFrontToFirstCarFront = vehicleToBlock * blockToFirstCarFront;
+                    if (i == 0)
+                    {
+                        carLocator = car.GetLocatorWithVibration(vehicleLocation, vehicleBlockLocation, FirstCarOriginToFront, vehicleToBlock);
+                        firstCarLocator = carLocator;
+                    }
+                    else
+                    {
+                        carLocator = car.GetLocatorWithVibration(vehicleLocation, vehicleBlockLocation, firstCarLocator);
+                    }
+                }
+                else
+                {
+                    carLocator = car.GetLocator(vehicleLocation, vehicleBlockLocation);
                 }
 
-                Matrix vibration = vehicleFrontToFirstCarFront;
-                vibration.M41 *= VibrationCoefficients[i];
-                vibration.M42 *= VibrationCoefficients[i];
-                vibration.M43 *= VibrationCoefficients[i];
-                Matrix transform = (Vibrate ? vibration : Matrix.Identity) * carToBlock * blockToCamera;
-                Direct3DProvider.Device.SetTransform(TransformState.World, transform);
-
-                car.Model.Draw(Direct3DProvider, false);
-                car.Model.Draw(Direct3DProvider, true);
+                carLocator = carLocator.Multiply(VibrationCoefficients[i]);
+                car.Draw(blockToCamera, carLocator);
             }
         }
     }
