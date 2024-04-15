@@ -35,6 +35,14 @@ namespace Automatic9045.AtsEx.VehicleStructure
             }
         }
 
+        public void Tick(TimeSpan elapsed, bool vibrate)
+        {
+            foreach (Car car in Cars)
+            {
+                car.Tick(elapsed, vibrate);
+            }
+        }
+
         public void DrawTrains(double vehicleLocation, Matrix vehicleToBlock, Matrix blockToCamera)
         {
             int vehicleBlockLocation = (int)vehicleLocation / 25 * 25;

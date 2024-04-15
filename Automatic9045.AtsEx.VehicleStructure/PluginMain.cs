@@ -13,6 +13,9 @@ using SlimDX;
 using AtsEx.PluginHost;
 using AtsEx.PluginHost.Plugins;
 
+using Automatic9045.AtsEx.VehicleStructure.Animation;
+using Automatic9045.AtsEx.VehicleStructure.Doors;
+
 namespace Automatic9045.AtsEx.VehicleStructure
 {
     [PluginType(PluginType.VehiclePlugin)]
@@ -24,6 +27,7 @@ namespace Automatic9045.AtsEx.VehicleStructure
         private readonly Data.Config Config;
         private readonly HarmonyPatch DrawObjectsPatch;
 
+        private Dictionary<string, DoorAnimation> DoorAnimations;
         private List<VehicleStructure> VehicleStructures;
 
         public PluginMain(PluginBuilder builder) : base(builder)
@@ -32,11 +36,18 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
             string path = Path.Combine(BaseDirectory, "VehicleStructure.Config.xml");
             Config = Data.Config.Deserialize(path, true);
+            foreach (Data.DoorAnimation doorAnimation in Config.DoorAnimations)
+            {
+                doorAnimation.OpenDiagram.Validate();
+                doorAnimation.CloseDiagram.Validate();
+            }
 
             FastMember.FastMethod drawObjectsMethod = BveHacker.BveTypes.GetClassInfoOf<ObjectDrawer>().GetSourceMethodOf(nameof(ObjectDrawer.Draw));
             DrawObjectsPatch = HarmonyPatch.Patch(nameof(BveHacker), drawObjectsMethod.Source, PatchType.Postfix);
             DrawObjectsPatch.Invoked += (sender, e) =>
             {
+                if (!BveHacker.IsScenarioCreated) return PatchInvokationResult.DoNothing(e);
+
                 UserVehicleLocationManager locationManager = BveHacker.Scenario.LocationManager;
                 Vehicle vehicle = BveHacker.Scenario.Vehicle;
                 MyTrack myTrack = BveHacker.Scenario.Route.MyTrack;
@@ -67,12 +78,36 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
         private void OnScenarioCreated(ScenarioCreatedEventArgs e)
         {
+            DoorAnimations = Config.DoorAnimations
+                .ToDictionary(item => item.Key, item =>
+                {
+                    DoorAnimationProgress openProgress = CreateProgress(item.OpenDiagram, false);
+                    DoorAnimationProgress closeProgress = CreateProgress(item.CloseDiagram, true);
+
+                    DoorAnimation doorAnimation = new DoorAnimation(openProgress, closeProgress);
+                    return doorAnimation;
+
+
+                    DoorAnimationProgress CreateProgress(Data.Diagram data, bool flipDurationSign)
+                    {
+                        IEnumerable<DiagramPoint> points = data.DiagramPoints.Select(pointData => new DiagramPoint(pointData.Progress, pointData.OpenRate));
+                        Diagram diagram = new Diagram(points);
+
+                        TimeSpan duration = TimeSpan.Parse(data.Duration);
+                        if (flipDurationSign) duration = duration.Negate();
+
+                        return new DoorAnimationProgress(diagram, duration, data.NaturalFrequency, data.DampingRatio, data.RestitutionFactor);
+                    }
+                });
+
             MatrixCalculator matrixCalculator = new MatrixCalculator(e.Scenario.Route);
+            DoorStateStore doorStateStore = new DoorStateStore(e.Scenario.Vehicle.Doors);
+            CarFactory carFactory = new CarFactory(Direct3DProvider.Instance, matrixCalculator, doorStateStore, DoorAnimations);
 
             VehicleStructures = Config.VehicleTrain.StructureGroups
                 .Select(group =>
                 {
-                    List<Car> cars = CarFactory.Create(Direct3DProvider.Instance, group.Structures, BaseDirectory, matrixCalculator);
+                    List<Car> cars = carFactory.Create(group.Structures, BaseDirectory);
                     Matrix firstCarOriginToFront = Matrix.Translation(0, 0, (float)group.FirstStructureFront);
 
                     VehicleStructure result = new VehicleStructure(Direct3DProvider.Instance, cars, group.Vibrate, firstCarOriginToFront);
@@ -83,6 +118,11 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
         public override TickResult Tick(TimeSpan elapsed)
         {
+            foreach (VehicleStructure vehicleStructure in VehicleStructures)
+            {
+                vehicleStructure.Tick(elapsed, BveHacker.Scenario.TimeManager.State != TimeManager.GameState.FastForward);
+            }
+
             return new VehiclePluginTickResult();
         }
 
@@ -98,6 +138,23 @@ namespace Automatic9045.AtsEx.VehicleStructure
 
             public Matrix GetTrackMatrix(LocatableMapObject mapObject, double to, double from)
                 => Route.GetTrackMatrix(mapObject, to, from);
+        }
+
+        private class DoorStateStore : IDoorStateStore
+        {
+            private readonly DoorSet Doors;
+
+            public DoorStateStore(DoorSet doors)
+            {
+                Doors = doors;
+            }
+
+            public bool IsOpen(int carIndex, DoorSide side)
+            {
+                SideDoorSet sideDoors = Doors.GetSide(side);
+                CarDoor carDoor = sideDoors.CarDoors[carIndex];
+                return carDoor.State == DoorState.Open;
+            }
         }
     }
 }

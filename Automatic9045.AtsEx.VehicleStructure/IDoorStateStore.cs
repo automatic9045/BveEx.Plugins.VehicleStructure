@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using BveTypes.ClassWrappers;
+
 namespace Automatic9045.AtsEx.VehicleStructure
 {
-    internal class Door
+    internal interface IDoorStateStore
     {
+        bool IsOpen(int carIndex, DoorSide side);
     }
 }

@@ -7,21 +7,14 @@ using System.Xml.Serialization;
 
 namespace Automatic9045.AtsEx.VehicleStructure.Data
 {
-    [XmlRoot]
-    public class Structure
+    public class DiagramPoint
     {
         [XmlAttribute]
-        public string Model = null;
+        public double Progress = 0;
 
         [XmlAttribute]
-        public double Distance = 0;
+        public double OpenRate = 0;
 
-        [XmlAttribute]
-        public double Span = 0;
-
-        [XmlAttribute]
-        public double Z = 0;
-
-        public Door[] Doors = new Door[0];
+        public override string ToString() => $"{Progress}, {OpenRate}";
     }
 }

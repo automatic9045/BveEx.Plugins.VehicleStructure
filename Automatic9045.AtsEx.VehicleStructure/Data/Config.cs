@@ -14,6 +14,7 @@ namespace Automatic9045.AtsEx.VehicleStructure.Data
     {
         private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(Config));
 
+        public DoorAnimation[] DoorAnimations = new DoorAnimation[0];
         public VehicleTrain VehicleTrain = new VehicleTrain();
 
         public void Serialize(string path)

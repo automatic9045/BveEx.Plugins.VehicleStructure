@@ -7,28 +7,76 @@ using System.Threading.Tasks;
 
 using BveTypes.ClassWrappers;
 
+using Automatic9045.AtsEx.VehicleStructure.Doors;
+
 namespace Automatic9045.AtsEx.VehicleStructure
 {
-    internal static class CarFactory
+    internal class CarFactory
     {
-        public static List<Car> Create(Direct3DProvider direct3DProvider, Data.Structure[] data, string baseDirectory, IMatrixCalculator matrixCalculator)
+        private readonly Direct3DProvider Direct3DProvider;
+        private readonly IMatrixCalculator MatrixCalculator;
+        private readonly IDoorStateStore DoorStateStore;
+
+        private readonly IReadOnlyDictionary<string, DoorAnimation> DoorAnimations;
+
+        public CarFactory(Direct3DProvider direct3DProvider, IMatrixCalculator matrixCalculator, IDoorStateStore doorStateStore, IReadOnlyDictionary<string, DoorAnimation> doorAnimations)
+        {
+            Direct3DProvider = direct3DProvider;
+            MatrixCalculator = matrixCalculator;
+            DoorStateStore = doorStateStore;
+
+            DoorAnimations = doorAnimations;
+        }
+
+        public List<Car> Create(Data.Structure[] data, string baseDirectory)
         {
             List<Car> cars = data
-                .Select(x =>
+                .Select((carData, i) =>
                 {
-                    string modelPath = Path.Combine(baseDirectory, x.Model);
-                    Model model = Model.FromXFile(modelPath);
-                    Structure structure = new Structure(
-                        x.Distance, string.Empty,
-                        0, 0, x.Z, 0, 0, 0,
-                        TiltOptions.TiltsAlongGradient | TiltOptions.TiltsAlongCant, x.Span, model);
+                    Model carModel = LoadModel(carData.Model);
+                    Structure carStructure = new Structure(carData.Distance, string.Empty, 0, 0, carData.Z, 0, 0, 0, TiltOptions.TiltsAlongGradient | TiltOptions.TiltsAlongCant, carData.Span, carModel);
 
-                    Car car = new Car(direct3DProvider, structure, Enumerable.Empty<Door>(), matrixCalculator);
+                    List<Door> doors = carData.Doors
+                        .Select(doorData =>
+                        {
+                            Model doorModel = LoadModel(doorData.Model);
+
+                            DoorSide doorSide;
+                            switch (doorData.Side)
+                            {
+                                case Data.DoorSide.Left:
+                                    doorSide = DoorSide.Left;
+                                    break;
+                                case Data.DoorSide.Right:
+                                    doorSide = DoorSide.Right;
+                                    break;
+                                default:
+                                    throw new NotSupportedException();
+                            }
+
+                            if (!DoorAnimations.TryGetValue(doorData.AnimationKey, out DoorAnimation doorAnimation))
+                            {
+                                doorAnimation = DoorAnimation.Default;
+                            }
+
+                            return new Door(Direct3DProvider, doorModel, doorData.X, doorData.Y, doorData.Z, i, doorSide, (DoorAnimation)doorAnimation.Clone(), doorData.OpenWidth);
+                        })
+                        .ToList();
+
+                    Car car = new Car(Direct3DProvider, carStructure, doors, MatrixCalculator, DoorStateStore);
                     return car;
                 })
                 .ToList();
 
             return cars;
+
+
+            Model LoadModel(string modelPath)
+            {
+                string modelAbsolutePath = Path.Combine(baseDirectory, modelPath);
+                Model model = Model.FromXFile(modelAbsolutePath);
+                return model;
+            }
         }
     }
 }

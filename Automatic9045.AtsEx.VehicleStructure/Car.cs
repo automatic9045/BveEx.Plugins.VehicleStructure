@@ -9,7 +9,8 @@ using SlimDX;
 using SlimDX.Direct3D9;
 
 using BveTypes.ClassWrappers;
-using SlimDX.XInput;
+
+using Automatic9045.AtsEx.VehicleStructure.Doors;
 
 namespace Automatic9045.AtsEx.VehicleStructure
 {
@@ -21,8 +22,9 @@ namespace Automatic9045.AtsEx.VehicleStructure
         private readonly IEnumerable<Door> Doors;
 
         private readonly IMatrixCalculator MatrixCalculator;
+        private readonly IDoorStateStore DoorStateStore;
 
-        public Car(Direct3DProvider direct3DProvider, Structure structure, IEnumerable<Door> doors, IMatrixCalculator matrixCalculator)
+        public Car(Direct3DProvider direct3DProvider, Structure structure, IEnumerable<Door> doors, IMatrixCalculator matrixCalculator, IDoorStateStore doorStateStore)
         {
             Direct3DProvider = direct3DProvider;
 
@@ -30,6 +32,7 @@ namespace Automatic9045.AtsEx.VehicleStructure
             Doors = doors;
 
             MatrixCalculator = matrixCalculator;
+            DoorStateStore = doorStateStore;
         }
 
         public ILocator GetLocatorWithVibration(double vehicleLocation, double vehicleBlockLocation, Matrix firstCarOriginToFront, Matrix vehicleToBlock)
@@ -62,10 +65,24 @@ namespace Automatic9045.AtsEx.VehicleStructure
             return carToBlock;
         }
 
+        public void Tick(TimeSpan elapsed, bool vibrate)
+        {
+            foreach (Door door in Doors)
+            {
+                bool isOpen = DoorStateStore.IsOpen(door.CarIndex, door.Side);
+                door.Tick(elapsed, isOpen, vibrate);
+            }
+        }
+
         public void Draw(Matrix blockToCamera, ILocator locator)
         {
             Matrix transform = locator.Transform * blockToCamera;
             Direct3DProvider.Device.SetTransform(TransformState.World, transform);
+
+            foreach (Door door in Doors)
+            {
+                door.Draw();
+            }
 
             Structure.Model.Draw(Direct3DProvider.Instance, false);
             Structure.Model.Draw(Direct3DProvider.Instance, true);
