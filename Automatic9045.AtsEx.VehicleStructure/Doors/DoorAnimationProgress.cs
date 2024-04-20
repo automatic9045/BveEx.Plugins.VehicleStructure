@@ -32,7 +32,7 @@ namespace Automatic9045.AtsEx.VehicleStructure.Doors
 
             double targetOpenRate = Diagram.GetValue(newProgressValue);
 
-            if (vibrate)
+            if (vibrate && elapsed.TotalSeconds < 1.1 / NaturalFrequency)
             {
                 double acceleration = Math.Max(-1000, Math.Min(1000, -NaturalFrequency * NaturalFrequency * (previous.OpenRate - targetOpenRate) - 2 * DampingRatio * NaturalFrequency * previous.Velocity));
                 double velocity = previous.Velocity + acceleration * elapsed.TotalSeconds;
