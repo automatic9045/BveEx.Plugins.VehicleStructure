@@ -36,5 +36,29 @@ namespace Automatic9045.AtsEx.VehicleStructure.Animation
 
             return oldPoint.Y;
         }
+
+        public bool TryGetX(double value, out double x)
+        {
+            DiagramPoint oldPoint = default;
+            foreach (DiagramPoint point in Points)
+            {
+                if (value == point.Y)
+                {
+                    x = point.X;
+                    return true;
+                }
+
+                if (Math.Sign(oldPoint.Y - value) == Math.Sign(value - point.Y))
+                {
+                    x = oldPoint.X + (point.X - oldPoint.X) * (value - oldPoint.Y) / (point.Y - oldPoint.Y);
+                    return true;
+                }
+
+                oldPoint = point;
+            }
+
+            x = default;
+            return false;
+        }
     }
 }

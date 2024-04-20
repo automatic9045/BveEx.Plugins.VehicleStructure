@@ -27,6 +27,7 @@ namespace Automatic9045.AtsEx.VehicleStructure.Doors
         private readonly DoorAnimationProgress OpenProgress;
         private readonly DoorAnimationProgress CloseProgress;
 
+        private bool IsOpen = false;
         private ProgressInfo ProgressInfo = default;
         public double ProgressValue => ProgressInfo.ProgressValue;
         public double OpenRate => ProgressInfo.OpenRate;
@@ -41,7 +42,29 @@ namespace Automatic9045.AtsEx.VehicleStructure.Doors
 
         public void Tick(TimeSpan elapsed, bool isOpen, bool vibrate)
         {
-            ProgressInfo = isOpen ? OpenProgress.Tick(elapsed, ProgressInfo, vibrate) : CloseProgress.Tick(elapsed, ProgressInfo, vibrate);
+            DoorAnimationProgress progress = isOpen ? OpenProgress : CloseProgress;
+
+            if (isOpen != IsOpen)
+            {
+                ProgressInfo newProgressInfo = progress.Tick(elapsed, ProgressInfo, vibrate);
+                if (Math.Abs(newProgressInfo.OpenRate - ProgressInfo.OpenRate) < 0.01)
+                {
+                    ProgressInfo = newProgressInfo;
+                }
+                else
+                {
+                    _ = progress.TryGetProgressValue(ProgressInfo.OpenRate, out double progressValue);
+                    ProgressInfo fixedProgressInfo = new ProgressInfo(progressValue, ProgressInfo.Velocity, ProgressInfo.OpenRate);
+
+                    ProgressInfo = progress.Tick(elapsed, fixedProgressInfo, vibrate);
+                }
+
+                IsOpen = isOpen;
+            }
+            else
+            {
+                ProgressInfo = progress.Tick(elapsed, ProgressInfo, vibrate);
+            }
         }
     }
 }

@@ -47,5 +47,8 @@ namespace Automatic9045.AtsEx.VehicleStructure.Doors
                 return new ProgressInfo(newProgressValue, velocity, targetOpenRate);
             }
         }
+
+        public bool TryGetProgressValue(double openRate, out double progressValue)
+            => Diagram.TryGetX(openRate, out progressValue);
     }
 }
