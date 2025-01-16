@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Data
+namespace Automatic9045.BveEx.VehicleStructure.Data
 {
     public class VehicleTrain
     {

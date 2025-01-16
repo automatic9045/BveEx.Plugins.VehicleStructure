@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Data
+namespace Automatic9045.BveEx.VehicleStructure.Data
 {
     [XmlRoot]
     public class Config

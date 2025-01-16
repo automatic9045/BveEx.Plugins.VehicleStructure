@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("自列車のストラクチャーを描画します。")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("automatic9045")]
-[assembly: AssemblyProduct("AtsEX プラグイン")]
+[assembly: AssemblyProduct("BveEX プラグイン")]
 [assembly: AssemblyCopyright("Copyright © 2023 automatic9045")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

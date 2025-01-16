@@ -9,7 +9,7 @@ using SlimDX.Direct3D9;
 
 using BveTypes.ClassWrappers;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Doors
+namespace Automatic9045.BveEx.VehicleStructure.Doors
 {
     internal class Door
     {

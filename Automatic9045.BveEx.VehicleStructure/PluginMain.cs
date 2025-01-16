@@ -10,15 +10,15 @@ using BveTypes.ClassWrappers;
 using ObjectiveHarmonyPatch;
 using SlimDX;
 
-using AtsEx.PluginHost;
-using AtsEx.PluginHost.Plugins;
+using BveEx.PluginHost;
+using BveEx.PluginHost.Plugins;
 
-using Automatic9045.AtsEx.VehicleStructure.Animation;
-using Automatic9045.AtsEx.VehicleStructure.Doors;
+using Automatic9045.BveEx.VehicleStructure.Animation;
+using Automatic9045.BveEx.VehicleStructure.Doors;
 
-namespace Automatic9045.AtsEx.VehicleStructure
+namespace Automatic9045.BveEx.VehicleStructure
 {
-    [PluginType(PluginType.VehiclePlugin)]
+    [Plugin(PluginType.VehiclePlugin)]
     public class PluginMain : AssemblyPluginBase
     {
         private static readonly string AssemblyLocation = Assembly.GetExecutingAssembly().Location;
@@ -48,21 +48,19 @@ namespace Automatic9045.AtsEx.VehicleStructure
             {
                 if (!BveHacker.IsScenarioCreated) return PatchInvokationResult.DoNothing(e);
 
-                UserVehicleLocationManager locationManager = BveHacker.Scenario.LocationManager;
+                VehicleLocation vehicleLocation = BveHacker.Scenario.VehicleLocation;
                 Vehicle vehicle = BveHacker.Scenario.Vehicle;
-                MyTrack myTrack = BveHacker.Scenario.Route.MyTrack;
-
-                double vehicleLocation = locationManager.Location;
+                MyTrack myTrack = BveHacker.Scenario.Map.MyTrack;
 
                 Matrix blockToCamera = vehicle.CameraLocation.TransformFromBlock;
                 Matrix blockToVehicle =
-                    vehicle.VibrationManager.Positioner.BlockToCarCenterTransform.Matrix
-                    * vehicle.VibrationManager.CarBodyTransform.Matrix
-                    * vehicle.VibrationManager.ViewPoint.GetTranslation();
+                    vehicle.Vibration.Positioner.BlockToCarCenterTransform.Matrix
+                    * vehicle.Vibration.CarBodyTransform.Matrix
+                    * vehicle.Vibration.ViewPoint.GetTranslation();
 
                 foreach (VehicleStructure vehicleStructure in VehicleStructures)
                 {
-                    vehicleStructure.DrawTrains(vehicleLocation, Matrix.Invert(blockToVehicle), blockToCamera);
+                    vehicleStructure.DrawTrains(vehicleLocation.Location, Matrix.Invert(blockToVehicle), blockToCamera);
                 }
 
                 return PatchInvokationResult.DoNothing(e);
@@ -100,7 +98,7 @@ namespace Automatic9045.AtsEx.VehicleStructure
                     }
                 });
 
-            MatrixCalculator matrixCalculator = new MatrixCalculator(e.Scenario.Route);
+            MatrixCalculator matrixCalculator = new MatrixCalculator(e.Scenario.Map);
             DoorStateStore doorStateStore = new DoorStateStore(e.Scenario.Vehicle.Doors);
             CarFactory carFactory = new CarFactory(Direct3DProvider.Instance, matrixCalculator, doorStateStore, DoorAnimations);
 
@@ -116,28 +114,28 @@ namespace Automatic9045.AtsEx.VehicleStructure
                 .ToList();
         }
 
-        public override TickResult Tick(TimeSpan elapsed)
+        public override void Tick(TimeSpan elapsed)
         {
             foreach (VehicleStructure vehicleStructure in VehicleStructures)
             {
                 vehicleStructure.Tick(elapsed, BveHacker.Scenario.TimeManager.State != TimeManager.GameState.FastForward);
             }
 
-            return new VehiclePluginTickResult();
+            return;
         }
 
 
         private class MatrixCalculator : IMatrixCalculator
         {
-            private readonly Route Route;
+            private readonly Map Map;
 
-            public MatrixCalculator(Route route)
+            public MatrixCalculator(Map map)
             {
-                Route = route;
+                Map = map;
             }
 
             public Matrix GetTrackMatrix(LocatableMapObject mapObject, double to, double from)
-                => Route.GetTrackMatrix(mapObject, to, from);
+                => Map.GetTrackMatrix(mapObject, to, from);
         }
 
         private class DoorStateStore : IDoorStateStore

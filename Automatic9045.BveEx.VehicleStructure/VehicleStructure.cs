@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SlimDX;
-using SlimDX.Direct3D9;
 
 using BveTypes.ClassWrappers;
 
-namespace Automatic9045.AtsEx.VehicleStructure
+namespace Automatic9045.BveEx.VehicleStructure
 {
     internal class VehicleStructure
     {

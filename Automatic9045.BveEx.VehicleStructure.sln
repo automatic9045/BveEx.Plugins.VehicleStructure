@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Automatic9045.AtsEx.VehicleStructure", "Automatic9045.AtsEx.VehicleStructure\Automatic9045.AtsEx.VehicleStructure.csproj", "{D356810D-C43A-4491-8EA6-D45087AEF1BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Automatic9045.BveEx.VehicleStructure", "Automatic9045.BveEx.VehicleStructure\Automatic9045.BveEx.VehicleStructure.csproj", "{D356810D-C43A-4491-8EA6-D45087AEF1BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

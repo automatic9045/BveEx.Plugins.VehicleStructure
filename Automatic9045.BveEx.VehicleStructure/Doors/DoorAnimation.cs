@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Automatic9045.AtsEx.VehicleStructure.Animation;
+using Automatic9045.BveEx.VehicleStructure.Animation;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Doors
+namespace Automatic9045.BveEx.VehicleStructure.Doors
 {
     internal class DoorAnimation : ICloneable
     {

@@ -5,30 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Data
+namespace Automatic9045.BveEx.VehicleStructure.Data
 {
     [XmlRoot]
-    public class Door
+    public class Structure
     {
         [XmlAttribute]
         public string Model = null;
 
         [XmlAttribute]
-        public double X = 0;
+        public double Distance = 0;
 
         [XmlAttribute]
-        public double Y = 0;
+        public double Span = 0;
 
         [XmlAttribute]
         public double Z = 0;
 
-        [XmlAttribute]
-        public DoorSide Side = DoorSide.Left;
-
-        [XmlAttribute]
-        public double OpenWidth = 0.65;
-
-        [XmlAttribute]
-        public string AnimationKey = string.Empty;
+        public Door[] Doors = new Door[0];
     }
 }

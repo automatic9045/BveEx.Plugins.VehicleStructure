@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using BveTypes.ClassWrappers;
 using SlimDX;
 
-namespace Automatic9045.AtsEx.VehicleStructure
+namespace Automatic9045.BveEx.VehicleStructure
 {
     internal interface IMatrixCalculator
     {

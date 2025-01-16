@@ -8,7 +8,7 @@ using SlimDX;
 
 using BveTypes.ClassWrappers;
 
-namespace Automatic9045.AtsEx.VehicleStructure
+namespace Automatic9045.BveEx.VehicleStructure
 {
     internal static class SixDofExtensions
     {

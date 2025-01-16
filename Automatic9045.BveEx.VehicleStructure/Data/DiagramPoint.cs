@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Data
+namespace Automatic9045.BveEx.VehicleStructure.Data
 {
     public class DiagramPoint
     {

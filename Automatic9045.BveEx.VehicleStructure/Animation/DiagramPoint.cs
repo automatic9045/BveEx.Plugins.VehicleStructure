@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Automatic9045.AtsEx.VehicleStructure.Animation
+namespace Automatic9045.BveEx.VehicleStructure.Animation
 {
     internal struct DiagramPoint : IComparable<DiagramPoint>
     {

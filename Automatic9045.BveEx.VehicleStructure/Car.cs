@@ -10,9 +10,9 @@ using SlimDX.Direct3D9;
 
 using BveTypes.ClassWrappers;
 
-using Automatic9045.AtsEx.VehicleStructure.Doors;
+using Automatic9045.BveEx.VehicleStructure.Doors;
 
-namespace Automatic9045.AtsEx.VehicleStructure
+namespace Automatic9045.BveEx.VehicleStructure
 {
     internal class Car
     {
