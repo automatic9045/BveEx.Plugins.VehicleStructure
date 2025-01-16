@@ -1,19 +1,23 @@
 # AtsEx.Plugins.VehicleStructure
-【BVE/AtsEX】自列車のストラクチャーを描画するプラグインです。
+【BVE/BveEX】自列車のストラクチャーを描画するプラグインです。
 
-詳しくは [AtsEX 公式ホームページ](https://automatic9045.github.io/AtsEX.Docs.Plugins/vehicle-structure/) をご覧ください。
+詳しくは [BveEX 公式ホームページ](https://automatic9045.github.io/AtsEX.Docs.Plugins/vehicle-structure/) をご覧ください。
 
 ## ライセンス
 
-[The MIT License modified with Commons Clause v1.0](LICENSE.txt)
+[PolyForm Noncommercial License 1.0.0](LICENSE.md)
 
 このライセンスにおいて禁止されている方法での利用（商用利用のうち、一部のケースなど）をご希望の場合は、個別にお問い合わせください。
 
 ## 使用ライブラリ等
-### [AtsEx.PluginHost](https://github.com/automatic9045/AtsEX) (MIT) およびそれが参照するライブラリ
+### [BveEx.PluginHost](https://github.com/automatic9045/BveEX) (PolyForm NonCommercial 1.0.0)
 Copyright (c) 2022 automatic9045
 
-AtsEx.PluginHost が参照するライブラリについては、[AtsEX のリポジトリ](https://github.com/automatic9045/AtsEX) をご参照ください。
+### [Harmony](https://github.com/pardeike/Harmony) (MIT)
+Copyright (c) 2017 Andreas Pardeike
 
-### [ObjectiveHarmonyPatch](https://github.com/automatic9045/AtsEX) (MIT)
+### [ObjectiveHarmonyPatch](https://github.com/automatic9045/ObjectiveHarmonyPatch) (MIT)
 Copyright (c) 2022 automatic9045
+
+### [SlimDX](https://www.nuget.org/packages/SlimDX/) (MIT)
+Copyright (c) 2013  exDreamDuck
